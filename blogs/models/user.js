@@ -13,7 +13,12 @@ User.init({
   username: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      isEmail: {
+        msg: 'Username must be an email address'
+      }
+    }
   },
   name: {
     type: DataTypes.STRING,

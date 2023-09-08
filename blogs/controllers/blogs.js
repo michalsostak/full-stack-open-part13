@@ -26,12 +26,33 @@ router.post('/', tokenExtractor, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
+  const where = {}
+
+  if (req.query.search) {
+    where[Op.or] = [
+      {
+        title: {
+          [Op.substring]: req.query.search
+        }
+      },
+      {
+        author: {
+          [Op.substring]: req.query.search
+        }
+      }
+    ]
+  }
+
   const blogs = await Blog.findAll({
     attributes: { exclude: ['userId'] },
     include: {
       model: User,
       attributes: ['name', 'username']
-    }
+    },
+    where,
+    order: [
+      ['likes', 'DESC']
+    ],
   })
   console.log(JSON.stringify(blogs, null, 2))
   res.json(blogs)

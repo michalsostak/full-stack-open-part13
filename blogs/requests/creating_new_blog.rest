@@ -1,10 +1,11 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RlckB0ZXN0LmNvbSIsImlkIjoyLCJpYXQiOjE2OTQxNzQyMzZ9.NdE30xhkoast1ldfc4wzePbTBM80pGYiaCjk0Afe_2I
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluQGFkbWluLmNvbSIsImlkIjoxLCJpYXQiOjE2OTQzNTM0NDF9.MctaIIegQ3356rMztIKotBslk6nup3C2g0iXOxYL-rc
 
 {
     "title": "new person6",
     "author": "1234567",
     "url": "www.test2.com",
-    "likes": 999
+    "likes": 999,
+    "year": 1992
 }

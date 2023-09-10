@@ -58,22 +58,22 @@ router.get('/:id', async (req, res) => {
           model: User,
           attributes: ['name']
         }
-      },
-      {
-        model: Team,
-        attributes: ['name', 'id'],
-        through: {
-          attributes: []
-        }
-      },
+      }
     ]
   })
 
-  if (user) {
-    res.json(user)
-  } else {
-    res.status(404).end()
+  if (!user) {
+    return res.status(404).end()
   }
+
+  let teams = undefined
+  if (req.query.teams) {
+    teams = await user.getTeams({
+      attributes: ['name'],
+      joinTableAttributes: []  
+    })
+  }
+  res.json({ ...user.toJSON(), teams })
 })
 
 router.put('/:username', tokenExtractor, isAdmin, async (req, res) => {

@@ -1,5 +1,6 @@
 const { SECRET } = require('../util/config')
 const jwt = require('jsonwebtoken')
+const { Session, User } = require("../models")
 
 const errorHandler = (error, req, res, next) => {
   console.log("Error message: ", error.message)
@@ -28,4 +29,29 @@ const tokenExtractor = (req, res, next) => {
   next()
 }
 
-module.exports = { errorHandler, tokenExtractor };
+const sessionExtractor = async (req, res, next) => {
+  const authorizationTokenWithoutBearer = req.get('authorization').substring(7)
+  const session = await Session.findOne({
+    where: {
+      token: authorizationTokenWithoutBearer,
+    },
+  })
+
+  if (!session) {
+    return res.status(401).json({ error: "No active sessions found. Please log in again." })
+  }
+
+  req.session = session
+  next();
+};
+
+const userExtractor = async (req, res, next) => {
+  const user = await User.findByPk(req.decodedToken.id)
+  if (user.disabled) {
+    return res.status(401).json({ error: "Unauthorized, user account has been disabled." }) 
+  }
+  req.user = user
+  next()
+}
+
+module.exports = { errorHandler, tokenExtractor, sessionExtractor, userExtractor };

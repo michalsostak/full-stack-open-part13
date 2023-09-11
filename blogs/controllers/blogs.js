@@ -2,11 +2,11 @@ const router = require('express').Router()
 const { Op } = require('sequelize')
 
 const { Blog, User } = require('../models')
-const { tokenExtractor } = require('../util/middleware')
+const { tokenExtractor, sessionExtractor, userExtractor } = require('../util/middleware')
 
-router.post('/', tokenExtractor, async (req, res) => {
-  const user = await User.findByPk(req.decodedToken.id)
-  const blog = await Blog.create({ ...req.body, userId: user.id })
+router.post('/', tokenExtractor, sessionExtractor, userExtractor, async (req, res) => {
+  console.log('posting here')
+  const blog = await Blog.create({ ...req.body, userId: req.user.id })
   return res.status(201).json(blog)
 })
 
@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
       ['likes', 'DESC']
     ],
   })
-  console.log(JSON.stringify(blogs, null, 2))
+  // console.log(JSON.stringify(blogs, null, 2))
   res.json(blogs)
 })
 
@@ -52,16 +52,15 @@ router.get('/:id', blogFinder, async (req, res) => {
   res.json(req.blog)
 })
 
-router.put('/:id', blogFinder, async (req, res) => {
+router.put('/:id', blogFinder, tokenExtractor, sessionExtractor, userExtractor, async (req, res) => {
   req.blog.likes = req.body.likes
   await req.blog.save()
   res.json(req.blog)
 })
 
 
-router.delete('/:id', blogFinder, tokenExtractor, async (req, res) => {
-  const user = await User.findByPk(req.decodedToken.id)
-  if (req.blog.userId === user.id) {
+router.delete('/:id', blogFinder, tokenExtractor, sessionExtractor, userExtractor, async (req, res) => {
+  if (req.blog.userId === req.user.id) {
     await req.blog.destroy();
     res.status(204).end();
   }
